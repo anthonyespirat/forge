@@ -14,7 +14,6 @@ A skill-driven dev workflow for Claude Code (and opencode): **describe → plan 
 - **Skills, not orchestration.** Each skill knows what comes next. No top-level router.
 - **Plan on disk, not in context.** Survives compaction; reviewable in your editor.
 - **Choice of isolation.** In-session for feedback fidelity, subagent-driven for big plans — you pick per task.
-- **One todo, owned by the executor.** No double-tracking.
 - **Shared debugger.** Any executor loads it when stuck.
 - **No destructive ops without explicit ask.** No commits, pushes, or PRs from skills or subagents.
 - **Short reports.** Agent output capped (~200–500 words). Raw dumps kill context.
