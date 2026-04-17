@@ -19,7 +19,5 @@
     "debugger",
     "gitnexus",
     "linear"
-  ],
-  "agents": ["./agents/"],
-  "skills": ["./skills/"]
+  ]
 }
