@@ -109,16 +109,18 @@ You can also invoke any skill directly:
 
 ### As a Claude Code plugin (recommended)
 
-Local path install (for testing before publishing):
+The repo ships its own single-repo marketplace (`.claude-plugin/marketplace.json`), so two commands install it:
 
 ```bash
-claude plugin install ~/code/agent-flow
+claude plugin marketplace add anthonyespirat/agent-flow
+claude plugin install agent-flow@agent-flow-marketplace
 ```
 
-From a GitHub repo:
+Or from inside a Claude Code session:
 
-```bash
-claude plugin install anthonyespirat/agent-flow
+```
+/plugin marketplace add anthonyespirat/agent-flow
+/plugin install agent-flow@agent-flow-marketplace
 ```
 
 Uninstall:
@@ -181,7 +183,8 @@ The flow: plan is written, you're shown a summary + the path + two mode options.
 ```
 agent-flow/
 ├── .claude-plugin/
-│   └── plugin.json
+│   ├── plugin.json
+│   └── marketplace.json
 ├── README.md
 ├── skills/
 │   ├── using-agent-flow/SKILL.md
