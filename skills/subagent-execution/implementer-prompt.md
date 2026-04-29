@@ -1,6 +1,8 @@
 # Implementer subagent prompt template
 
-Use this template when dispatching a subagent for a single STEP of the plan. Fill in the placeholders, then pass the whole block as the `prompt` argument to the `Agent` tool (with `subagent_type: general-purpose`).
+Use this template when dispatching a subagent for a single STEP of the plan. Fill in the placeholders, then pass the whole block as the `prompt` argument.
+- **Claude:** `Agent` tool, `subagent_type: general-purpose`.
+- **OpenCode:** `Task` tool, `subagent_type: general`.
 
 **Do NOT paste the plan file path and let the subagent read it.** Paste the step text, relevant files, skills, and any prior-step context directly. If a type, signature, or config shape matters, paste it inline under `EXCERPTS:` in the dispatch — the template tells the subagent to prefer those over re-reading.
 
@@ -42,7 +44,7 @@ EXCERPTS (optional — paste signatures, snippets, configs verbatim):
 
 If stuck — an unexplained typecheck/runtime error, a symbol whose real
 shape you need to confirm, or you catch yourself about to guess — invoke
-the `debugger` skill via the `Skill` tool. Fold its fix into this STEP;
+the `debugger` skill via the `Skill` tool (Claude) or `skill` tool (OpenCode). Fold its fix into this STEP;
 do NOT expand scope from its diagnosis.
 
 ## Forbidden

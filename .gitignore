@@ -8,3 +8,5 @@ webapp
 webapp-*
 speech.md
 .claude/plan
+.forge/plan
+.opencode/plan

@@ -7,7 +7,7 @@
 >
 > Currently biased toward **TypeScript** projects (typecheck defaults, suggested skills, assumed tooling). PRs welcome to make it language-agnostic.
 
-A skill-driven dev workflow for Claude Code (and opencode): **describe → plan → pick mode → execute → test**. No orchestrator. Skills trigger on intent and hand off to each other.
+A skill-driven dev workflow for **Claude Code** and **OpenCode**: **describe → plan → pick mode → execute → test**. No orchestrator. Skills trigger on intent and hand off to each other.
 
 *Built by developers, for developers.*
 
@@ -18,17 +18,17 @@ A skill-driven dev workflow for Claude Code (and opencode): **describe → plan 
 - **Choice of isolation.** In-session for feedback fidelity, subagent-driven for big plans — you pick per task.
 - **Shared debugger.** Any executor loads it when stuck.
 - **No destructive ops without explicit ask.** No commits, pushes, or PRs from skills or subagents.
-- **Short reports.** Agent output capped (~150–500 words). Raw dumps kill context.
-- **Per-subagent model choice.** In `subagent-execution`: `sonnet` default, `haiku` for mechanical steps, `opus` only on upgrade signal.
-- **🚀 [GitNexus](https://github.com/abhigyanpatwari/GitNexus) over grep.** Code exploration goes principaly through the GitNexus knowledge graph — faster, more precise, and far cheaper in tokens than repeated file scans.
-- **🦴 [Caveman](https://github.com/JuliusBrussee/caveman) for agent-to-agent.** Selected skills and sub-agents emit their machine-consumed sections (reports handed to another skill, not shown to the user) in caveman style — cuts the payload roughly in half while preserving signal.
+- **Short reports.** Subagent output capped (~150–500 words). Raw dumps kill context.
+- **Per-subagent model selection by capability.** Match model tier to task complexity: fast/cheap for mechanical steps, standard for multi-file edits, most capable for architectural judgment. Platform-managed where not configurable.
+- **🚀 [GitNexus](https://github.com/abhigyanpatwari/GitNexus) over grep.** Code exploration goes through the GitNexus knowledge graph — faster, more precise, and far cheaper in tokens than repeated file scans.
+- **🦴 [Caveman](https://github.com/JuliusBrussee/caveman) for agent-to-agent.** Selected skills and sub-agents emit machine-consumed sections in caveman style — cuts the payload roughly in half while preserving signal.
 
 ## Flow
 
 ```mermaid
 flowchart LR
     User([💬 describe task]) ==> Plan[📝 <b>plan</b><br/><i>writing-plans</i>]
-    Plan ==> File[(📄 .claude/plan/*.md)]
+    Plan ==> File[(📄 .forge/plan/*.md)]
     File ==> Mode{{🎛️ mode?}}
     Mode ==>|in-session| Exec[⚡ <b>execute</b><br/><i>executing-plans</i>]
     Mode ==>|subagents| Sub[🧩 <b>delegate</b><br/><i>subagent-execution</i>]
@@ -59,7 +59,7 @@ One path, two execution flavors. Context gathering and the debugger show up only
 | Skill | Role |
 |---|---|
 | `using-forge` | Entry gate — routes dev tasks into the flow. |
-| `writing-plans` | Gathers context, writes `.claude/plan/{slug}.md`. |
+| `writing-plans` | Gathers context, writes `.forge/plan/{slug}.md`. |
 | `executing-plans` | Runs the plan in-session. |
 | `subagent-execution` | Runs the plan via one subagent per STEP. |
 | `debugger` | Diagnostic playbook, loaded on failure. |
@@ -74,27 +74,34 @@ One path, two execution flavors. Context gathering and the debugger show up only
 
 ## Plan artifact
 
-A single markdown file at `.claude/plan/{slug}.md`.
+A single markdown file at `.forge/plan/{slug}.md`.
 
 - `{slug}` = lowercased Linear ticket id (e.g. `eng-123`) if present, else a short kebab-case slug (≤ 40 chars, no dates).
 - Sections: `GOAL`, `APPROACH`, `SKILLS TO APPLY`, `FILES TO CHANGE`, `STEPS` (checklist), `TESTS TO UPDATE/ADD`, `RISKS`, `OUT OF SCOPE`.
 - Every STEP starts with `- [ ]` — the executor builds its todo from these.
 - On change requests, `writing-plans` overwrites the same file. No `v2`.
+- Backward compatibility: if `.forge/` doesn't exist, fall back to `.claude/plan/` (Claude) or `.opencode/plan/` (OpenCode).
 
 ## How skills trigger
 
 There is no orchestrator. The skills chain themselves:
 
-1. You describe a dev task → Claude Code's skill matcher fires `using-forge` (meta) which checks whether `writing-plans` applies. For any non-trivial code task, it does.
+1. You describe a dev task → the skill matcher fires `using-forge` (meta) which checks whether `writing-plans` applies. For any non-trivial code task, it does.
 2. `writing-plans` runs → writes the plan → prints the handoff block.
 3. You pick `1` or `2` → that skill fires and executes.
 4. Executor ends by offering `test-runner`.
 
 You can also invoke any skill directly:
 
+**Claude Code:**
 ```
 /write-plan add rate limiter to login endpoint
-/execute-plan .claude/plan/eng-482.md
+/execute-plan .forge/plan/eng-482.md
+```
+
+**OpenCode:**
+```
+/skill using-forge add rate limiter to login endpoint
 ```
 
 ## Prerequisites
@@ -109,9 +116,11 @@ You can also invoke any skill directly:
 
 ## Install
 
-### As a Claude Code plugin (recommended)
+### Claude Code
 
-The repo ships its own single-repo marketplace (`.claude-plugin/marketplace.json`), so two commands install it:
+**Plugin (recommended):**
+
+The repo ships its own single-repo marketplace (`.claude-plugin/marketplace.json`):
 
 ```bash
 claude plugin marketplace add anthonyespirat/forge
@@ -131,21 +140,55 @@ Uninstall:
 claude plugin uninstall forge
 ```
 
-### Manual copy (no plugin system)
-
-Claude Code:
+**Manual copy:**
 
 ```bash
 cp -r skills/* ~/.claude/skills/
 cp agents/*.md ~/.claude/agents/
 ```
 
-opencode:
+### OpenCode
+
+**Plugin (recommended):**
+
+Add forge to the `plugin` array in your `opencode.json` (global or project-level):
+
+```json
+{
+  "plugin": ["forge@git+https://github.com/anthonyespirat/forge.git"]
+}
+```
+
+Restart OpenCode. The plugin auto-installs via Bun and registers all skills automatically.
+
+Verify by asking: "Tell me about your forge skills"
+
+**What the plugin does:**
+
+1. **Auto-discovers skills** — the `config` hook injects the `skills/` directory into OpenCode's skill paths. No manual `cp` or symlinks needed.
+2. **Injects bootstrap context** — the `experimental.chat.messages.transform` hook loads `using-forge` into every new session automatically. You don't need to invoke `/skill using-forge` manually.
+3. **Preserves plan state** — the `experimental.session.compacting` hook saves forge workflow context across session compaction.
+
+**As an npm plugin (alternative):**
 
 ```bash
-cp -r skills/* ~/.config/opencode/skill/
-# opencode agents live in a different layout — adapt as needed
+npm install forge-opencode
 ```
+
+```json
+{
+  "plugin": ["forge-opencode"]
+}
+```
+
+**Manual copy (fallback):**
+
+```bash
+cp -r skills/* ~/.config/opencode/skills/
+cp agents/*.md ~/.config/opencode/agents/
+```
+
+OpenCode does not have a separate agent directory concept — agents are dispatched via the `Task` tool. The `agents/*.md` files serve as prompt templates referenced by the skills.
 
 ## Usage
 
@@ -167,15 +210,28 @@ The flow: plan is written, you're shown a summary + the path + two mode options.
 
 ```
 forge/
-├── .claude-plugin/
+├── .claude-plugin/          # Claude Code plugin metadata
 │   ├── plugin.json
 │   └── marketplace.json
+├── .opencode/               # OpenCode plugin (auto-discovery + bootstrap)
+│   └── plugins/
+│       └── forge.js
+├── opencode-plugin/         # OpenCode npm package source
+│   ├── package.json
+│   ├── index.js
+│   └── forge-plugin.js
 ├── README.md
 ├── skills/
 │   ├── using-forge/SKILL.md
 │   ├── writing-plans/SKILL.md
 │   ├── executing-plans/SKILL.md
-│   ├── subagent-execution/SKILL.md
+│   ├── subagent-execution/
+│   │   ├── SKILL.md
+│   │   ├── implementer-prompt.md
+│   │   └── references/
+│   │       ├── model-selection.md
+│   │       ├── dispatch-loop.md
+│   │       └── handling-status.md
 │   └── debugger/
 │       ├── SKILL.md
 │       └── references/

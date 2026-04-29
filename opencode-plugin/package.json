@@ -1,0 +1,33 @@
+{
+  "name": "forge-opencode",
+  "version": "0.1.0",
+  "description": "OpenCode plugin for Forge — a skill-driven dev workflow. Auto-discovers skills, injects bootstrap context, and preserves plan state across compaction.",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "forge-plugin.js",
+    "skills/"
+  ],
+  "scripts": {
+    "prepublishOnly": "rm -rf skills && cp -r ../skills skills"
+  },
+  "keywords": [
+    "opencode",
+    "plugin",
+    "forge",
+    "skills",
+    "workflow"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "Anthony Espirat",
+    "email": "github.retrace234@passmail.net"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anthonyespirat/forge"
+  },
+  "peerDependencies": {
+    "@opencode-ai/plugin": "^0.x"
+  }
+}

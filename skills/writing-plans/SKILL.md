@@ -1,6 +1,6 @@
 ---
 name: writing-plans
-description: Use when the user describes a dev task (feature, bugfix, refactor, multi-step change) before touching code. Gathers repo and ticket context, writes a structured plan to .claude/plan/{slug}.md, self-reviews it, then hands off execution to either executing-plans (in-session) or subagent-execution (one subagent per step).
+description: "Turns a free-form dev task into a concrete plan on disk. Gathers repo and ticket context, writes a structured plan to .forge/plan/{slug}.md, self-reviews it, then hands off execution."
 ---
 
 # Writing plans
@@ -11,7 +11,7 @@ Turn a free-form dev task into a concrete plan on disk. Do NOT write code here.
 
 ## Output artifact
 
-A single markdown file at `.claude/plan/{slug}.md` in the project's working directory.
+A single markdown file at `.forge/plan/{slug}.md` in the project's working directory.
 
 - `{slug}` = lowercased Linear ticket id (e.g. `eng-123`) if present, else a short kebab-case slug from the task goal (≤ 40 chars, no dates).
 - Write with the `Write` tool — it creates parent directories.
@@ -23,8 +23,12 @@ A single markdown file at `.claude/plan/{slug}.md` in the project's working dire
 
 Before drafting, make sure you have enough to plan against:
 
-1. **Ticket context (if referenced).** If the user message contains a Linear ref (`ENG-123` or URL), dispatch the `ticket-fetcher` agent to pull the ticket summary.
-2. **Repo context.** Dispatch the `codebase-explorer` agent with the task description (+ ticket summary if any). It returns: relevant symbols/files, patterns, gotchas, applicable guideline skills, scope (backend / frontend / fullstack).
+1. **Ticket context (if referenced).** If the user message contains a Linear ref (`ENG-123` or URL), dispatch the `ticket-fetcher` subagent to pull the ticket summary.
+   - **Claude:** use the `Agent` tool.
+   - **OpenCode:** use the `Task` tool with `subagent_type: general`.
+2. **Repo context.** Dispatch the `codebase-explorer` subagent with the task description (+ ticket summary if any). It returns: relevant symbols/files, patterns, gotchas, applicable guideline skills, scope (backend / frontend / fullstack).
+   - **Claude:** use the `Agent` tool.
+   - **OpenCode:** use the `Task` tool with `subagent_type: explore`.
    - Skip ONLY if the task is trivially isolated (e.g. "add this constant to this file") or if rich repo context is already in this conversation.
 3. **Clarify if ambiguous.** If intent is unclear after both, ask ONE targeted question before writing the plan. Don't ask about preferences the user hasn't signaled — just resolve blockers.
 
@@ -60,7 +64,7 @@ Fix issues inline. No need to re-review — just fix and move on.
 Print exactly this block and stop. Do NOT start executing.
 
 ```
-PLAN: .claude/plan/{slug}.md
+PLAN: .forge/plan/{slug}.md
 
 <3-5 line summary — goal + step count + key risks>
 
@@ -80,7 +84,7 @@ Which mode? (or: request plan changes / skip execution)
 
 Then wait for the user's answer.
 
-- User says **1 / in-session / "go" with no preference** → invoke the `executing-plans` skill.
+- User says **1 / in-session / "go" with no preference** → invoke the `executing-plans` skill (`Skill` tool on Claude, `skill` tool on OpenCode).
 - User says **2 / subagent / "dispatch"** → invoke the `subagent-execution` skill.
 - User requests **plan changes** → revise the plan file (overwrite the same path), self-review again, reprint the handoff.
 - User says **skip / cancel** → stop.
