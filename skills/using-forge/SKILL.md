@@ -1,6 +1,6 @@
 ---
 name: using-forge
-description: Use when the user describes a dev task (feature, bugfix, refactor, or anything that will touch code). Establishes the skill-check discipline — before writing code or answering, verify whether writing-plans, executing-plans, or subagent-execution should run first.
+description: "Routes dev tasks into the forge planning workflow. Checks whether writing-plans, executing-plans, or subagent-execution should run before any code is touched."
 ---
 
 # Using forge
@@ -16,7 +16,7 @@ If you were dispatched as a subagent to execute a specific task, skip this skill
 If there's even a 1% chance that one of these applies, invoke it:
 
 - **`writing-plans`** — user describes a feature, bugfix, refactor, or multi-step change. Before any code. Triggers on phrases like "add", "build", "fix", "refactor", "implement", a Linear reference (`ENG-123`), or any task that isn't a pure one-liner question.
-- **`executing-plans`** — a plan file already exists (`.claude/plan/*.md`) and the user wants it executed in this session.
+- **`executing-plans`** — a plan file already exists (`.forge/plan/*.md`) and the user wants it executed in this session.
 - **`subagent-execution`** — same as above but the user picked the subagent-driven mode, or wants the main chat kept light.
 
 If none apply, proceed normally.

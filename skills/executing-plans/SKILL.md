@@ -1,6 +1,6 @@
 ---
 name: executing-plans
-description: Use when a plan file at .claude/plan/{slug}.md exists and the user has chosen in-session execution (mode [1] from writing-plans). Reads the plan, critically reviews it, builds a todo from its STEPS, executes each step in this conversation, and loads the debugger skill on errors.
+description: "Executes an existing plan in-session. Reads the plan, builds a todo from its STEPS, executes each step in this conversation, and loads the debugger skill on errors."
 ---
 
 # Executing plans (in-session)
@@ -11,7 +11,7 @@ You execute a plan in the current conversation. You do NOT re-plan, re-explore, 
 
 ## Input
 
-- Path to the validated plan file (e.g. `.claude/plan/eng-123.md`). If the user didn't give it explicitly, use the most recent file in `.claude/plan/`.
+- Path to the validated plan file (e.g. `.forge/plan/eng-123.md`). If the user didn't give it explicitly, use the most recent file in `.forge/plan/`.
 
 ## Process
 
@@ -46,7 +46,7 @@ Call `TodoWrite` once with one task per STEP:
 
 ### Step 3 — Load guidelines
 
-For each skill in `SKILLS TO APPLY`, invoke it (via the `Skill` tool) or `Read` its SKILL.md if unavailable. These are your constraints — naming, structure, patterns. Respect them.
+For each skill in `SKILLS TO APPLY`, invoke it (via the `Skill` tool on Claude, `skill` tool on OpenCode) or `Read` its SKILL.md if unavailable. These are your constraints — naming, structure, patterns. Respect them.
 
 If no skills are listed, follow the conventions observed in the files touched by the plan.
 
@@ -64,7 +64,7 @@ Do not start the next task before the current one is `completed`.
 
 ### Step 5 — When stuck, use the debugger skill
 
-Invoke the `debugger` skill (via `Skill` tool, else `Read` `.claude/skills/debugger/SKILL.md`) when you hit ANY of:
+Invoke the `debugger` skill (via `Skill` tool on Claude, `skill` tool on OpenCode, else `Read` the debugger SKILL.md) when you hit ANY of:
 
 - A TypeScript/lint error whose cause isn't obvious after reading the file
 - A runtime exception surfaced during the edit (e.g. module-load error)
@@ -109,9 +109,12 @@ IF BLOCKED:
 
 End with:
 
-> "Implementation done. Run the `test-runner` agent? (scope: backend / frontend / fullstack)"
+> "Implementation done. Run the `test-runner` subagent? (scope: backend / frontend / fullstack)"
 
-If the user says yes, dispatch the `test-runner` agent with scope + files changed. On failures, loop back into the debugger/fix cycle ONLY if the user asks you to fix. Max 2 fix iterations before escalating.
+If the user says yes, dispatch the `test-runner` subagent with scope + files changed.
+- **Claude:** use the `Agent` tool.
+- **OpenCode:** use the `Task` tool with `subagent_type: general`.
+On failures, loop back into the debugger/fix cycle ONLY if the user asks you to fix. Max 2 fix iterations before escalating.
 
 ## Rules
 
