@@ -3,8 +3,8 @@
 For frontend debugging via Chrome, use the **`chrome-devtools` skill** already installed in this workspace. It covers browser automation, DOM inspection, network analysis, console capture, and performance profiling.
 
 Invocation (from the caller's context, not from this reference):
-- Via the `Skill` tool: `Skill(skill="chrome-devtools", args="<one-line symptom>")`
-- Or load its `SKILL.md` directly if `Skill` isn't available in scope.
+- Via the skill tool: invoke `chrome-devtools` (`Skill` on Claude, `skill` on OpenCode).
+- Or load its `SKILL.md` directly if the skill tool isn't available in scope.
 
 Minimum to pass when delegating:
 - SYMPTOM (one line)

@@ -1,6 +1,6 @@
 ---
 name: debugger
-description: Diagnostic methodology and tool routing for stuck implementations and failing tests. Use when an implementation step is blocked by an error you can't immediately explain, when a typecheck/lint fails with a non-obvious cause, when a test-runner reports a failure whose root cause needs investigation, or when a frontend behavior diverges from expected. NOT for planning or scope expansion — only for diagnosing a specific symptom.
+description: "Diagnostic playbook for stuck implementations and failing tests. Classifies symptoms, isolates root causes, and returns minimal fix suggestions. Not for planning or scope expansion."
 ---
 
 # debugger
@@ -10,20 +10,20 @@ You diagnose a specific failing symptom. You do NOT re-architect, refactor, or e
 ## When the caller (implementer/test-runner) invokes you
 
 The caller passes:
-- **SYMPTOM**: one sentence describing what's wrong (error message, unexpected behavior, failing check)
-- **CONTEXT**: file(s) involved, scope (backend/frontend/fullstack), recent changes
+- **SYMPTOM**: one sentence describing what's wrong
+- **CONTEXT**: file(s) involved, scope, recent changes
 - **TRIED**: anything already attempted (if re-invoked)
 
 ## Core loop
 
 1. **Classify the symptom** — pick ONE category → load the matching reference
 2. **Reproduce or confirm** — don't debug what you can't observe
-3. **Isolate** — narrow to the smallest failing unit (one function, one line, one query)
-4. **Hypothesize** — state what you believe is wrong in one sentence
-5. **Verify** — use tools to confirm the hypothesis before suggesting a fix
-6. **Report** — diagnosis + fix suggestion in the output format below
+3. **Isolate** — narrow to the smallest failing unit
+4. **Hypothesize** — state the root cause in one sentence
+5. **Verify** — use tools to confirm before suggesting a fix
+6. **Report** — diagnosis + fix suggestion
 
-Do not jump to step 5 without doing 3. Most bad debugging is skipping isolation.
+Do not jump to step 5 without doing 3.
 
 ## Symptom → reference routing
 
@@ -31,14 +31,14 @@ Load only the reference you need. Each is self-contained.
 
 | Symptom | Reference |
 |---|---|
-| TS compile error, type mismatch, "cannot find name", generic constraint violation | `references/typecheck.md` |
+| TS compile error, type mismatch, "cannot find name" | `references/typecheck.md` |
 | ESLint / prettier rule failure, style errors | `references/lint.md` |
-| Runtime exception, stack trace, "undefined is not a function", null deref | `references/runtime-errors.md` |
-| Need to understand what calls/defines/implements a symbol before changing it | `references/lsp.md` |
-| Frontend: visual bug, element missing, event not firing, style wrong, network call failing in browser | delegate to the `chrome-devtools` skill (already installed) |
-| You genuinely don't know what's happening — need diagnostic instrumentation | `references/console-logging.md` |
+| Runtime exception, stack trace, null deref | `references/runtime-errors.md` |
+| Need to understand calls/defines/implements of a symbol | `references/lsp.md` |
+| Frontend visual bug, element missing, network failing | delegate to the `chrome-devtools` skill |
+| Need diagnostic instrumentation | `references/console-logging.md` |
 
-If the symptom doesn't fit, pick the closest one. You may combine two (e.g. typecheck + lsp when a type error needs symbol tracing).
+If the symptom doesn't fit, pick the closest one. You may combine two.
 
 ## Output format
 
@@ -69,9 +69,9 @@ IF STILL BLOCKED:
 ```
 
 ## Rules
-- One symptom per invocation. If two unrelated failures appear, return the primary, mention the secondary as a NOTE.
-- Never fix silently in unrelated files. Suggestions only touch the failing unit.
-- If the fix crosses into design decisions (API shape, schema change, new dependency), STOP — that's out of scope for debug. Report and escalate.
+- One symptom per invocation.
+- Never fix silently in unrelated files.
+- If the fix crosses into design decisions, STOP and escalate.
 - Max 2 tool-verification rounds before returning `IF STILL BLOCKED`.
 - Cap output at ~350 words.
-- Read the relevant reference BEFORE running tools — the reference tells you which tools to reach for.
+- Read the relevant reference BEFORE running tools.
