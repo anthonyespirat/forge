@@ -1,8 +1,6 @@
 # Implementer subagent prompt template
 
 Use this template when dispatching a subagent for a single STEP of the plan. Fill in the placeholders, then pass the whole block as the `prompt` argument.
-- **Claude:** `Agent` tool, `subagent_type: general-purpose`.
-- **OpenCode:** `Task` tool, `subagent_type: general`.
 
 **Do NOT paste the plan file path and let the subagent read it.** Paste the step text, relevant files, skills, and any prior-step context directly. If a type, signature, or config shape matters, paste it inline under `EXCERPTS:` in the dispatch — the template tells the subagent to prefer those over re-reading.
 

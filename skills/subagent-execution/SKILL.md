@@ -13,13 +13,6 @@ Execute a plan by dispatching a fresh subagent per STEP. You (the controller) ow
 
 Each subagent gets exactly the context it needs for its step — no more, no less. They don't inherit this conversation's history. You curate their inputs and review their summaries.
 
-## Tool differences
-
-| Action | Claude | OpenCode |
-|--------|--------|----------|
-| Dispatch subagent | `Agent` tool | `Task` tool with `subagent_type` |
-| Invoke skill | `Skill` tool | `skill` tool |
-
 ## Model selection
 
 Use the least powerful model that can handle the step. Match capability to complexity.
@@ -65,9 +58,7 @@ Call `TodoWrite` once with one task per STEP (`content`, `activeForm`, `status: 
 Group steps into parallel batches (disjoint files + no dependency). For each batch:
 
 1. `TodoWrite` → mark batch `in_progress`.
-2. **In a single message**, emit one dispatch per step:
-   - **Claude:** `Agent` tool, `subagent_type: general-purpose`, `model` per capability tier above.
-   - **OpenCode:** `Task` tool, `subagent_type: general`.
+2. **In a single message**, emit one `Agent` dispatch per step. Use the general implementer subagent and, on platforms that support per-dispatch model selection, set `model` per capability tier above.
    - Prompt from `./implementer-prompt.md` filled with STEP, SCENE, RELEVANT FILES, GUIDELINE SKILLS, PRIOR-STEP OUTPUTS.
 3. Wait for all reports.
 4. Handle each status per [references/handling-status.md](./references/handling-status.md).

@@ -32,6 +32,26 @@ writing-plans ─┬─▶ executing-plans         (user picks [1] in-session)
 
 `writing-plans` ends by asking the user which mode. `executing-plans` and `subagent-execution` end by offering to run the `test-runner` agent. That's the whole flow.
 
+## Platform tool glossary
+
+Forge skills use canonical Claude-style tool names. Translate those names to the current agent platform at runtime.
+
+| Forge canonical term | Claude Code | OpenCode |
+|---|---|---|
+| `Agent` | `Agent` | `Task` |
+| `Skill` | `Skill` | `skill` |
+| `TodoWrite` | `TodoWrite` | `todowrite` |
+| `Read` | `Read` | `read` |
+| `Write` | `Write` | `write` |
+| `Edit` | `Edit` | `edit` or `apply_patch` |
+| `Bash` | `Bash` | `bash` |
+| `Glob` | `Glob` | `glob` |
+| `Grep` | `Grep` | `grep` |
+| `WebFetch` | `WebFetch` | `webfetch` |
+| `AskUserQuestion` | `AskUserQuestion` | `question` |
+
+Downstream Forge skills should use the Forge canonical term. Do not repeat per-platform tool mappings unless a platform has materially different behavior that changes the instruction.
+
 ## Red flags — STOP if you think any of these
 
 | Thought | Reality |
