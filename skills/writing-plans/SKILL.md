@@ -11,12 +11,11 @@ Turn a free-form dev task into a concrete plan on disk. Do NOT write code here.
 
 ## Output artifact
 
-Default to a single markdown file at `.forge/plan/{slug}.md` in the project's working directory.
+A single markdown file at `.forge/plan/{slug}.md` in the project's working directory.
 
 - `{slug}` = lowercased Linear ticket id (e.g. `eng-123`) if present, else a short kebab-case slug from the task goal (≤ 40 chars, no dates).
 - Write with the `Write` tool — it creates parent directories.
 - On re-invocation with change requests, **overwrite** the same file. No stale versions.
-- If a multi-step plan needs multiple tightly related files, use a folder: `.forge/plan/{slug}/*.md`. Put the entry point at `.forge/plan/{slug}/plan-root.md`; it must include a short plan description plus an index of every related file with a one-line purpose.
 
 ## Process
 
@@ -61,7 +60,7 @@ Fix issues inline. No need to re-review — just fix and move on.
 Print exactly this block and stop. Do NOT start executing.
 
 ```
-PLAN: <.forge/plan/{slug}.md or .forge/plan/{slug}/plan-root.md>
+PLAN: .forge/plan/{slug}.md
 
 <3-5 line summary — goal + step count + key risks>
 
