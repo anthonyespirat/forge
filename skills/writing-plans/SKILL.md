@@ -1,11 +1,11 @@
 ---
 name: writing-plans
-description: "Turns a free-form dev task into a concrete plan on disk. Gathers repo and ticket context, writes a structured plan to .forge/plan/{slug}.md, self-reviews it, then hands off execution."
+description: "Turns a concrete dev task or approved decision brief into a plan on disk. Gathers repo and ticket context, writes .forge/plan/{slug}.md, self-reviews it, then hands off execution."
 ---
 
 # Writing plans
 
-Turn a free-form dev task into a concrete plan on disk. Do NOT write code here.
+Turn a concrete dev task or approved decision brief into a plan on disk. Do NOT write code here.
 
 **Announce at start:** "Using `writing-plans` to draft the plan."
 
@@ -19,6 +19,10 @@ Default to a single markdown file at `.forge/plan/{slug}.md` in the project's wo
 - If a multi-step plan needs multiple tightly related files, use a folder: `.forge/plan/{slug}/*.md`. Put the entry point at `.forge/plan/{slug}/plan-root.md`; it must include a short plan description plus an index of every related file with a one-line purpose.
 
 ## Process
+
+### Step 0 — Check whether brainstorming should run first
+
+If the task asks to brainstorm, grill, challenge, compare approaches, design a new flow/API/architecture, clarify domain language, or starts from a fuzzy idea, do not plan yet. Invoke `brainstorm` and stop, unless the user has already approved a decision brief in this conversation.
 
 ### Step 1 — Gather context
 

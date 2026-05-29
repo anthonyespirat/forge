@@ -13,7 +13,7 @@ There are no build, test, or lint scripts. Changes are made directly to `.md` an
 ## Repository Structure
 
 ```
-skills/          # 5 skills, each with SKILL.md
+skills/          # 6 skills, each with SKILL.md
 agents/          # 3 sub-agent prompt definitions
 .claude-plugin/  # Claude Code plugin metadata (plugin.json, marketplace.json)
 README.md
@@ -23,10 +23,11 @@ README.md
 
 Skills chain themselves — there is no orchestrator.
 
-1. **using-forge** — Entry gate. Routes dev tasks to the planning skill.
-2. **writing-plans** — Gathers context via sub-agents, drafts `.forge/plan/{slug}.md` in the user's project, then presents a handoff block.
-3. User picks **[1] executing-plans** (in-session, high feedback, ≤5 steps) or **[2] subagent-execution** (one fresh subagent per step, for large plans).
-4. **debugger** — On-demand diagnosis. Any executor loads it when stuck.
+1. **using-forge** — Entry gate. Routes dev tasks to brainstorming, planning, or execution.
+2. **brainstorm** — Optional pre-plan grill for fuzzy ideas, approach selection, and domain-language clarification.
+3. **writing-plans** — Gathers context via sub-agents, drafts `.forge/plan/{slug}.md` in the user's project, then presents a handoff block.
+4. User picks **[1] executing-plans** (in-session, high feedback, ≤5 steps) or **[2] subagent-execution** (one fresh subagent per step, for large plans).
+5. **debugger** — On-demand diagnosis. Any executor loads it when stuck.
 
 ## Plan Artifact
 

@@ -7,7 +7,7 @@
 >
 > Currently biased toward **TypeScript** projects (typecheck defaults, suggested skills, assumed tooling). PRs welcome to make it language-agnostic.
 
-A skill-driven dev workflow for **Claude Code** and **OpenCode**: **describe → plan → pick mode → execute → test**. No orchestrator. Skills trigger on intent and hand off to each other.
+A skill-driven dev workflow for **Claude Code** and **OpenCode**: **describe → brainstorm when needed → plan → pick mode → execute → test**. No orchestrator. Skills trigger on intent and hand off to each other.
 
 *Built by developers, for developers.*
 
@@ -27,7 +27,10 @@ A skill-driven dev workflow for **Claude Code** and **OpenCode**: **describe →
 
 ```mermaid
 flowchart LR
-    User([💬 describe task]) ==> Plan[📝 <b>plan</b><br/><i>writing-plans</i>]
+    User([💬 describe task]) ==> Shape{{💭 fuzzy?}}
+    Shape ==>|yes| Brainstorm[💡 <b>shape</b><br/><i>brainstorm</i>]
+    Shape ==>|no| Plan[📝 <b>plan</b><br/><i>writing-plans</i>]
+    Brainstorm ==> Plan
     Plan ==> File[(📄 .forge/plan/*.md)]
     File ==> Mode{{🎛️ mode?}}
     Mode ==>|in-session| Exec[⚡ <b>execute</b><br/><i>executing-plans</i>]
@@ -44,13 +47,13 @@ flowchart LR
     classDef pick fill:#fde68a,stroke:#d97706,color:#111
     classDef file fill:#e0f2fe,stroke:#0284c7,color:#111
 
-    class Plan,Exec,Sub main
+    class Brainstorm,Plan,Exec,Sub main
     class Ctx,Dbg side
-    class Mode pick
+    class Shape,Mode pick
     class File file
 ```
 
-One path, two execution flavors. Context gathering and the debugger show up only when needed.
+One path, two execution flavors. Brainstorming, context gathering, and the debugger show up only when needed.
 
 ## Components
 
@@ -59,6 +62,7 @@ One path, two execution flavors. Context gathering and the debugger show up only
 | Skill | Role |
 |---|---|
 | `using-forge` | Entry gate — routes dev tasks into the flow. |
+| `brainstorm` | Optional pre-plan grill — shapes fuzzy ideas, terms, and approaches before planning. |
 | `writing-plans` | Gathers context, writes `.forge/plan/{slug}.md`. |
 | `executing-plans` | Runs the plan in-session. |
 | `subagent-execution` | Runs the plan via one subagent per STEP. |
@@ -86,10 +90,11 @@ A single markdown file at `.forge/plan/{slug}.md`.
 
 There is no orchestrator. The skills chain themselves:
 
-1. You describe a dev task → the skill matcher fires `using-forge` (meta) which checks whether `writing-plans` applies. For any non-trivial code task, it does.
-2. `writing-plans` runs → writes the plan → prints the handoff block.
-3. You pick `1` or `2` → that skill fires and executes.
-4. Executor ends by offering `test-runner`.
+1. You describe a dev task → the skill matcher fires `using-forge` (meta) which checks whether `brainstorm`, `writing-plans`, or an executor applies.
+2. If the idea is fuzzy, design-heavy, or needs a grill, `brainstorm` runs first and hands the approved decision brief to `writing-plans`.
+3. `writing-plans` runs → writes the plan → prints the handoff block.
+4. You pick `1` or `2` → that skill fires and executes.
+5. Executor ends by offering `test-runner`.
 
 You can also invoke any skill directly:
 
@@ -192,7 +197,7 @@ OpenCode does not have a separate agent directory concept — agents are dispatc
 
 ## Usage
 
-Just describe the task — `using-forge` + `writing-plans` trigger automatically:
+Just describe the task — `using-forge` routes it to brainstorming when fuzzy, otherwise to `writing-plans`:
 
 ```
 add a rate limiter to the login endpoint
@@ -223,6 +228,7 @@ forge/
 ├── README.md
 ├── skills/
 │   ├── using-forge/SKILL.md
+│   ├── brainstorm/SKILL.md
 │   ├── writing-plans/SKILL.md
 │   ├── executing-plans/SKILL.md
 │   ├── subagent-execution/

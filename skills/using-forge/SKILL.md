@@ -1,6 +1,6 @@
 ---
 name: using-forge
-description: "Routes dev tasks into the forge planning workflow. Checks whether writing-plans, executing-plans, or subagent-execution should run before any code is touched."
+description: "Routes dev tasks into the forge workflow. Checks whether brainstorm, writing-plans, executing-plans, or subagent-execution should run before any code is touched."
 ---
 
 # Using forge
@@ -15,7 +15,8 @@ If you were dispatched as a subagent to execute a specific task, skip this skill
 
 If there's even a 1% chance that one of these applies, invoke it:
 
-- **`writing-plans`** — user describes a feature, bugfix, refactor, or multi-step change. Before any code. Triggers on phrases like "add", "build", "fix", "refactor", "implement", a Linear reference (`ENG-123`), or any task that isn't a pure one-liner question.
+- **`brainstorm`** — user asks to brainstorm, grill, challenge, compare approaches, design a new flow/API/architecture, clarify domain language, or starts from a fuzzy idea before planning. Use this before `writing-plans` when the approach itself is undecided.
+- **`writing-plans`** — user describes a feature, bugfix, refactor, or multi-step change with enough clarity to plan, or provides an approved `brainstorm` decision brief. Before any code. Excludes fuzzy brainstorming/design/grill/domain-language tasks until `brainstorm` resolves them.
 - **`executing-plans`** — a plan file already exists (`.forge/plan/*.md`) and the user wants it executed in this session.
 - **`subagent-execution`** — same as above but the user picked the subagent-driven mode, or wants the main chat kept light.
 
@@ -26,11 +27,11 @@ If none apply, proceed normally.
 The skills chain themselves — you don't orchestrate:
 
 ```
-writing-plans ─┬─▶ executing-plans         (user picks [1] in-session)
-               └─▶ subagent-execution      (user picks [2] subagent-driven)
+brainstorm ─▶ writing-plans ─┬─▶ executing-plans         (user picks [1] in-session)
+                              └─▶ subagent-execution      (user picks [2] subagent-driven)
 ```
 
-`writing-plans` ends by asking the user which mode. `executing-plans` and `subagent-execution` end by offering to run the `test-runner` agent. That's the whole flow.
+`brainstorm` is optional and only runs when the approach needs shaping before a plan. `writing-plans` ends by asking the user which mode. `executing-plans` and `subagent-execution` end by offering to run the `test-runner` agent. That's the whole flow.
 
 ## Platform tool glossary
 
@@ -58,6 +59,7 @@ Downstream Forge skills should use the Forge canonical term. Do not repeat per-p
 |---|---|
 | "This is a small change, I'll skip planning" | Small changes become big. Invoke writing-plans — a 3-step plan is cheap and the user can say "skip it, just do X" after seeing it. |
 | "Let me read the files first to see what's needed" | That's what codebase-explorer does inside writing-plans. Check the skill first. |
+| "The idea is fuzzy, but I'll make a plan and refine it later" | If the approach, vocabulary, or product shape is still undecided, invoke `brainstorm` before `writing-plans`. |
 | "I'll just fix the typo / rename / one-liner" | Truly trivial edits (typo, comment fix, single-line rename) can skip. Anything with logic or > 1 file: invoke writing-plans. |
 | "The user already has a plan in context, I'll just implement" | Exactly — that's why executing-plans or subagent-execution exists. Pick one. |
 | "I can do this faster manually than by dispatching" | Maybe, but you lose the on-disk plan + todo discipline. Use the skill. |
@@ -68,8 +70,4 @@ If the user explicitly says "skip planning, just do X" or "don't use subagents" 
 
 ## Announce before acting
 
-When you invoke one of these skills, say one short line:
-
-> "Using `writing-plans` to draft the plan for this change."
-
-No preamble, no explanation. One line, then run.
+When you invoke another Forge skill, use that skill's own `Announce at start` line. No preamble, no explanation. One line, then run.

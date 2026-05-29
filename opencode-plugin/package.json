@@ -1,7 +1,7 @@
 {
   "name": "forge-opencode",
   "version": "0.1.0",
-  "description": "OpenCode plugin for Forge — a skill-driven dev workflow. Auto-discovers skills, injects bootstrap context, and preserves plan state across compaction.",
+  "description": "OpenCode plugin for Forge — a skill-driven dev workflow with optional pre-plan brainstorming. Auto-discovers skills, injects bootstrap context, and preserves plan state across compaction.",
   "main": "index.js",
   "files": [
     "index.js",
@@ -15,6 +15,7 @@
     "opencode",
     "plugin",
     "forge",
+    "brainstorm",
     "skills",
     "workflow"
   ],
