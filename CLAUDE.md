@@ -23,11 +23,15 @@ README.md
 
 Skills chain themselves — there is no orchestrator.
 
-1. **using-forge** — Entry gate. Routes code tasks to brainstorming, planning, or execution.
-2. **brainstorm** — Optional pre-plan grill for fuzzy ideas, approach selection, and domain-language clarification.
-3. **writing-plans** — Gathers context via sub-agents, drafts `.forge/plan/{slug}.md` in the user's project, then presents a handoff block.
-4. User picks **[1] executing-plans** (in-session, high feedback, ≤5 steps) or **[2] subagent-execution** (one fresh subagent per step, for large plans).
+1. **using-forge** — Entry gate. Routes code tasks to the planning skill.
+2. **writing-plans** — Gathers context via sub-agents, drafts `.forge/plan/{slug}.md` in the user's project, then presents a handoff block.
+3. User picks **[1] executing-plans** (in-session, high feedback, ≤5 steps) or **[2] subagent-execution** (one fresh subagent per step, for large plans).
+4. Executor offers **test-runner** for typecheck / visual checks.
 5. **debugger** — On-demand diagnosis. Any executor loads it when stuck.
+
+## On-Demand Skills
+
+- **brainstorm** — Pre-plan grill for fuzzy ideas, approach selection, and domain-language clarification. Use only when explicitly requested by the user.
 
 ## Plan Artifact
 

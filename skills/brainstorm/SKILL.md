@@ -1,24 +1,23 @@
 ---
 name: brainstorm
-description: "Use when a dev task needs ideation, approach selection, domain-language clarification, or stress-testing before a Forge plan is written."
+description: "Use when the user explicitly asks to brainstorm, grill, challenge, compare approaches, clarify domain language, or stress-test a dev idea."
 ---
 
 # Brainstorm
 
-Turn a fuzzy idea into an approved decision brief before `writing-plans` creates an implementation plan. Do not write code, create a plan artifact, or modify project files unless the user explicitly approves a documentation update.
+Turn an explicitly requested brainstorming session into an approved decision brief. Do not write code, create a plan artifact, or modify project files unless the user explicitly approves a documentation update.
 
 **Announce at start:** "Using `brainstorm` to shape the approach before planning."
 
 ## When To Use
 
-Use before `writing-plans` when the user asks to:
+Use only when the user explicitly asks to:
 
 - brainstorm, grill, challenge, stress-test, or compare approaches
-- design a new flow, feature, architecture, UX, API, or agent behavior
-- work from a vague goal like "I have an idea", "not sure yet", or "propose something"
+- run `brainstorm` before planning
 - resolve overloaded domain language before planning, such as `tenant` vs `org` vs `customer`
 
-Skip when the user already gave a concrete task with clear acceptance criteria. In that case, go straight to `writing-plans`.
+Do not trigger this skill automatically just because a task is vague. If the user describes normal dev work, keep the main Forge flow light and go to `writing-plans`.
 
 ## Process
 
@@ -69,7 +68,7 @@ Approve this brief so I can move to `writing-plans`, or tell me what to change.
 
 | Mistake | Fix |
 |---|---|
-| Routing every vague idea straight to `writing-plans` | Use this skill first when the approach itself is undecided. |
+| Routing every vague idea here automatically | Only use this skill when the user explicitly asks for brainstorming or a grill. |
 | Asking a stack of questions | Ask one question at a time, with your recommendation. |
 | Treating plan self-review as brainstorming | Brainstorming happens before the plan exists. |
 | Accepting overloaded words "for now" | Resolve canonical language or record the ambiguity as a planning risk. |
@@ -77,9 +76,9 @@ Approve this brief so I can move to `writing-plans`, or tell me what to change.
 
 ## Red Flags
 
-- "I'll just write the plan and refine later."
+- "The idea is fuzzy, so I must run brainstorm automatically."
 - "The user said the terms are the same, so no need to challenge them."
 - "One clarification question is enough for a design problem."
 - "The plan review can serve as the grill."
 
-All of these mean: stop and run the brainstorming loop before `writing-plans`.
+All of these mean: respect the user's requested mode. Use `brainstorm` only on demand; otherwise keep the normal Forge flow light.
