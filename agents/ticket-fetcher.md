@@ -2,6 +2,7 @@
 name: ticket-fetcher
 description: "Fetches a Linear ticket via MCP and returns a concise summary. Use when a Linear reference (e.g. ENG-123) is mentioned and ticket context is needed."
 tools: linear
+dispatch: "Use the Agent tool (Claude Code) or Task tool with subagent_type 'ticket-fetcher' (OpenCode) to dispatch this subagent."
 ---
 
 # ticket-fetcher

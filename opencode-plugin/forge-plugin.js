@@ -25,21 +25,98 @@ const extractAndStripFrontmatter = (content) => {
   return { frontmatter, content: body }
 }
 
-// Resolve repo root from plugin location (works for both git clone and npm install)
-const resolveRepoRoot = () => {
+// Resolve skills from npm package, source checkout, or .opencode/plugins layout.
+const resolveSkillsDir = () => {
   const pluginDir = path.resolve(__dirname)
-  // When installed via git: plugin is at repo/.opencode/plugins/ or repo/opencode-plugin/
-  // When installed via npm: plugin is at node_modules/forge-opencode/
-  const gitRepoRoot = path.resolve(pluginDir, '../..')
-  const npmRepoRoot = path.resolve(pluginDir)
+  const candidates = [
+    path.join(pluginDir, '..', 'skills'),
+    path.join(pluginDir, '..', '..', 'skills'),
+    path.join(pluginDir, 'skills'),
+  ]
 
-  if (fs.existsSync(path.join(gitRepoRoot, 'skills', 'using-forge', 'SKILL.md'))) {
-    return gitRepoRoot
+  for (const skillsDir of candidates) {
+    if (fs.existsSync(path.join(skillsDir, 'using-forge', 'SKILL.md'))) {
+      return skillsDir
+    }
   }
-  return npmRepoRoot
+
+  return null
+}
+
+// Resolve agents directory from npm package, source checkout, or .opencode/plugins layout.
+const resolveAgentsDir = () => {
+  const pluginDir = path.resolve(__dirname)
+  const candidates = [
+    path.join(pluginDir, '..', 'agents'),
+    path.join(pluginDir, '..', '..', 'agents'),
+    path.join(pluginDir, 'agents'),
+  ]
+
+  for (const agentsDir of candidates) {
+    if (fs.existsSync(agentsDir)) {
+      const files = fs.readdirSync(agentsDir).filter(f => f.endsWith('.md'))
+      if (files.length > 0) return agentsDir
+    }
+  }
+
+  return null
+}
+
+// Map agent frontmatter tool names to OpenCode tool IDs.
+// Agent .md files use platform-agnostic tool names; translate to OpenCode equivalents.
+const mapToolToOpenCode = (tool) => {
+  const map = {
+    'Read': 'read',
+    'Write': 'write',
+    'Edit': 'edit',
+    'Bash': 'bash',
+    'Glob': 'glob',
+    'Grep': 'grep',
+    'Task': 'task',
+    'WebFetch': 'webfetch',
+    'chrome-devtools': 'chrome-devtools',
+  }
+  return map[tool] || tool
+}
+
+// Load agent definitions from the agents/ directory and register them
+// as OpenCode subagent configs so the Task tool can dispatch them by name.
+const loadAgents = (agentsDir) => {
+  if (!agentsDir) return {}
+
+  const agents = {}
+  const files = fs.readdirSync(agentsDir).filter(f => f.endsWith('.md'))
+
+  for (const file of files) {
+    const content = fs.readFileSync(path.join(agentsDir, file), 'utf8')
+    const { frontmatter, content: body } = extractAndStripFrontmatter(content)
+    const name = frontmatter.name || file.replace('.md', '')
+    if (!name) continue
+
+    const toolsEnabled = {}
+    if (frontmatter.tools) {
+      for (const tool of frontmatter.tools.split(',').map(t => t.trim())) {
+        if (tool) {
+          const opencodeTool = mapToolToOpenCode(tool)
+          toolsEnabled[opencodeTool] = true
+        }
+      }
+    }
+
+    agents[name] = {
+      mode: 'subagent',
+      description: frontmatter.description || '',
+      prompt: body.trim(),
+      ...(Object.keys(toolsEnabled).length > 0 ? { tools: toolsEnabled } : {}),
+    }
+  }
+
+  return agents
 }
 
 const getBootstrapContent = (skillsDir) => {
+  if (!skillsDir) return null
+
   const skillPath = path.join(skillsDir, 'using-forge', 'SKILL.md')
   if (!fs.existsSync(skillPath)) return null
 
@@ -68,17 +145,31 @@ ${toolMapping}
 }
 
 export const ForgePlugin = async ({ client }) => {
-  const repoRoot = resolveRepoRoot()
-  const skillsDir = path.join(repoRoot, 'skills')
+  const skillsDir = resolveSkillsDir()
+  const agentsDir = resolveAgentsDir()
+  const agents = loadAgents(agentsDir)
 
   return {
-    // Auto-register skills directory so OpenCode discovers forge skills
-    // without manual symlinks or config file edits.
+    // Auto-register skills directory and agents so OpenCode discovers
+    // forge skills and subagents without manual config file edits.
     config: async (config) => {
-      config.skills = config.skills || {}
-      config.skills.paths = config.skills.paths || []
-      if (!config.skills.paths.includes(skillsDir)) {
-        config.skills.paths.push(skillsDir)
+      if (!skillsDir) {
+        console.warn('[forge] Skills directory not found; forge skills will not be auto-loaded.')
+      } else {
+        config.skills = config.skills || {}
+        config.skills.paths = config.skills.paths || []
+        if (!config.skills.paths.includes(skillsDir)) {
+          config.skills.paths.push(skillsDir)
+        }
+      }
+
+      if (Object.keys(agents).length > 0) {
+        config.agent = config.agent || {}
+        for (const [name, agentConfig] of Object.entries(agents)) {
+          if (!config.agent[name]) {
+            config.agent[name] = agentConfig
+          }
+        }
       }
     },
 

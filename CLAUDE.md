@@ -49,11 +49,18 @@ Every STEP line must start with `- [ ]` — executors build todos from these.
 | `codebase-explorer` | Maps the repo via GitNexus knowledge graph before planning |
 | `test-runner` | Runs typecheck (backend) and chrome-devtools visual checks (frontend) after execution |
 
+Agent definitions live in `agents/` as Markdown files with frontmatter.
+
+**Claude Code**: Agents are symlinked into `.claude/agents/` so the `Agent` tool can discover them by name.
+
+**OpenCode**: The `forge-plugin.js` registers agents in `config.agent` at startup, making them available as `subagent_type` values in the `Task` tool.
+
 ## Platform Differences
 
 | Feature | Claude Code | OpenCode |
 |---------|-------------|----------|
-| Subagent dispatch | `Agent` tool | `Task` tool |
+| Subagent dispatch | `Agent` tool | `Task` tool with `subagent_type` |
+| Agent definitions | `.claude/agents/` directory | Registered via `forge-plugin.js` in `config.agent` |
 | Skill invocation | `Skill` tool | `skill` tool |
 | Per-subagent model | Configurable (fast/standard/most-capable) | Platform-managed |
 | Install path | `~/.claude/skills/` | Auto-discovered via plugin |

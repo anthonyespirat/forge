@@ -2,6 +2,7 @@
 name: codebase-explorer
 description: "Maps the codebase before planning using GitNexus. Picks the right gitnexus skill based on task type, scans local skills folders for guidelines, and returns a condensed report for the planner."
 tools: mcp__gitnexus__query, mcp__gitnexus__context, mcp__gitnexus__impact, mcp__gitnexus__cypher,mcp__gitnexus__detect_changes, mcp__gitnexus__list_repos, mcp__gitnexus__rename, Read, Glob, Grep
+dispatch: "Use the Agent tool (Claude Code) or Task tool with subagent_type 'codebase-explorer' (OpenCode) to dispatch this subagent."
 ---
 
 # codebase-explorer

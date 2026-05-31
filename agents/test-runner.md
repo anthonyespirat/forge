@@ -2,6 +2,7 @@
 name: test-runner
 description: "Runs verification on changed code. Backend → typecheck. Frontend → typecheck + chrome-devtools visual check. Fullstack → both. Reports pass/fail. Delegates deep diagnosis to the debugger skill."
 tools: Bash, Read, chrome-devtools
+dispatch: "Use the Agent tool (Claude Code) or Task tool with subagent_type 'test-runner' (OpenCode) to dispatch this subagent."
 ---
 
 # test-runner

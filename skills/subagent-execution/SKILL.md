@@ -58,7 +58,7 @@ Call `TodoWrite` once with one task per STEP (`content`, `activeForm`, `status: 
 Group steps into parallel batches (disjoint files + no dependency). For each batch:
 
 1. `TodoWrite` → mark batch `in_progress`.
-2. **In a single message**, emit one `Agent` dispatch per step. Use the general implementer subagent and, on platforms that support per-dispatch model selection, set `model` per capability tier above.
+2. **In a single message**, emit one `Agent` dispatch per step (Claude Code) or one `Task` dispatch per step with `subagent_type: "general"` (OpenCode). On platforms that support per-dispatch model selection, set `model` per capability tier above.
    - Prompt from `./implementer-prompt.md` filled with STEP, SCENE, RELEVANT FILES, GUIDELINE SKILLS, PRIOR-STEP OUTPUTS.
 3. Wait for all reports.
 4. Handle each status per [references/handling-status.md](./references/handling-status.md).
@@ -94,7 +94,7 @@ End with:
 
 > "Implementation done. Run the `test-runner` subagent? (scope: backend / frontend / fullstack)"
 
-Dispatch `test-runner` on failure. Max 2 fix iterations before escalating.
+Dispatch `test-runner` with `Agent` (Claude Code) or `Task` with `subagent_type: "test-runner"` (OpenCode) on failure. Max 2 fix iterations before escalating.
 
 ## Rules
 

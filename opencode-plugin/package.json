@@ -2,6 +2,7 @@
   "name": "forge-opencode",
   "version": "0.1.0",
   "description": "OpenCode plugin for Forge — a skill-driven dev workflow with an on-demand brainstorm skill. Auto-discovers skills, injects bootstrap context, and preserves plan state across compaction.",
+  "type": "module",
   "main": "index.js",
   "files": [
     "index.js",

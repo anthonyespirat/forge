@@ -24,8 +24,8 @@ Default to a single markdown file at `.forge/plan/{slug}.md` in the project's wo
 
 Before drafting, make sure you have enough to plan against:
 
-1. **Ticket context (if referenced).** If the user message contains a Linear ref (`ENG-123` or URL), dispatch the `ticket-fetcher` subagent with `Agent`.
-2. **Repo context.** Dispatch the `codebase-explorer` subagent with `Agent` and the task description (+ ticket summary if any). It returns: relevant symbols/files, patterns, gotchas, applicable guideline skills, scope (backend / frontend / fullstack).
+1. **Ticket context (if referenced).** If the user message contains a Linear ref (`ENG-123` or URL), dispatch the `ticket-fetcher` subagent with `Agent` (Claude Code) or `Task` with `subagent_type: "ticket-fetcher"` (OpenCode).
+2. **Repo context.** Dispatch the `codebase-explorer` subagent with `Agent` (Claude Code) or `Task` with `subagent_type: "codebase-explorer"` (OpenCode) and the task description (+ ticket summary if any). It returns: relevant symbols/files, patterns, gotchas, applicable guideline skills, scope (backend / frontend / fullstack).
    - Skip ONLY if the task is trivially isolated (e.g. "add this constant to this file") or if rich repo context is already in this conversation.
 3. **Clarify if ambiguous.** If intent is unclear after both, ask ONE targeted question before writing the plan. Don't ask about preferences the user hasn't signaled — just resolve blockers.
 

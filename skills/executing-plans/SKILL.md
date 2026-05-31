@@ -111,7 +111,7 @@ End with:
 
 > "Implementation done. Run the `test-runner` subagent? (scope: backend / frontend / fullstack)"
 
-If the user says yes, dispatch the `test-runner` subagent with `Agent`, scope, and files changed.
+If the user says yes, dispatch the `test-runner` subagent with `Agent` (Claude Code) or `Task` with `subagent_type: "test-runner"` (OpenCode), scope, and files changed.
 On failures, loop back into the debugger/fix cycle ONLY if the user asks you to fix. Max 2 fix iterations before escalating.
 
 ## Rules
